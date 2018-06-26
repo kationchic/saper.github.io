@@ -1,0 +1,129 @@
+@grey: #c0c0c0;
+@black: #000;
+@red: #f00;
+@cell_size: 20px;
+@blue: #00f;
+@green: #008000;
+@more: #57000d;
+
+.inner-border(@width){
+	border-left: @width solid darken(@grey,20%);
+	border-top: @width solid darken(@grey,20%);
+	border-right: @width solid white;
+	border-bottom: @width solid white;
+}
+
+.outer-border(@width){
+	border-right: @width solid darken(@grey,20%);
+	border-bottom: @width solid darken(@grey,20%);
+	border-left: @width solid white;
+	border-top: @width solid white;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+body{
+	background-color: @grey;
+	color: darken(@grey,40%);
+	section{		
+		margin: 20px auto;	
+		width: 260px;	
+		h1{
+			text-align: center;
+		}
+		.saper_field{	
+			.noselect;		
+			.outer-border(5px);
+			padding: 10px;
+			.counter{				
+				padding: 10px;
+				.inner-border(3px);				
+				margin-bottom: 15px;				
+				&_bombs,&_restart,&_time{					
+					display: table-cell;
+					vertical-align: middle;	
+					width: 33%;				
+				}	
+				.display{
+					width: 60px;
+					height: 24px;
+					line-height: 24px;
+					background-color: @black;
+					margin: 0px auto;
+					color: @red;
+					padding: 2px;
+					text-align: right;
+					font-size: 24px;
+					font-weight: bold;				
+					.inner-border(2px);					
+				}
+				.restart_btn{
+					.outer-border(2px);
+					width: 1+@cell_size;
+					height: 1+@cell_size;
+					text-align: center;
+					margin: 0px auto;					
+					.ok, .win, .lose{			
+						background: url("../img/smile.png") no-repeat;						
+						width: @cell_size;
+						height: @cell_size;
+					}
+					.ok{
+						background-position-x: 0px;
+					}
+					.win{
+						background-position-x: -1*@cell_size;
+					}
+					.lose{
+						background-position-x: -2*@cell_size;
+					}
+
+				}		
+			}
+			.field{
+				.inner-border(7px);
+			}
+		}
+	}
+}
+
+.cell{
+	border: 2px solid darken(@grey,20%);	
+	width: @cell_size;
+	height: @cell_size;
+	display: table-cell;
+	cursor: pointer;	
+	vertical-align: top;
+	text-align: center;
+	font-weight: bold;
+	.noselect;
+	&_close{
+		.outer-border(2px);
+	}
+	&_open_one{
+		color: @blue;
+	}	
+	&_open_two{
+		color: @green;
+	}
+	&_open_three{
+		color: @red;
+	}
+	&_open_more{
+		color: @more;
+	}
+	&_mine{		
+		background: url("../img/mine.png") no-repeat center center;		
+	}
+	&_flag{		
+		background: url("../img/flag.png") no-repeat center center;		
+	}
+}
