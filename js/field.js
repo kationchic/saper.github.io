@@ -1,8 +1,8 @@
-var Field= function(size){
+var Field= function(cnt, size){
 	this.field_width=size;
 	this.field_height=size;
-	this.mines= size;
-	this.field_cells=new Array();
+	this.mines= cnt;
+	this.field_cells=new Array();	
 	//создаем корпоратив ячеек
 	for(var i=0; i<this.field_width; i++)
 	{
@@ -16,45 +16,49 @@ var Field= function(size){
 	addEventListener("open_empty", this.EmptyCell.bind(this));
 }
 //открываем ячейки автоматически
-Field.prototype.openCells = function (i,j){
-	i*=1; j*=1;	
+Field.prototype.openDirect = function (i,j){	
+	if(this.field_cells[i][j].status==0){	
+		//если ячейка подходяща - симулируем нажатие		
+		this.field_cells[i][j].emitClick();
+		//а если она еще и пустая, то запускаем аццкую рекрсию
+		if(this.field_cells[i][j].isEmpty()) 
+			this.openCells(i,j);
+	}
+}
+//открываем ячейки вверх
+Field.prototype.openCellsTop = function (i,j){
 	if(i>0){
-		this.field_cells[i-1][j].emitClick();
-		if(this.field_cells[i-1][j].mines_around==0) 
-			if((i-1)>0)this.openCells(i-2,j);
-	}
-	if(j>0){
-		this.field_cells[i][j-1].emitClick();
-		if(this.field_cells[i][j-1].mines_around==0) 
-			if((j-1)>0)this.openCells(i,j-2);
+		this.openDirect(i-1,j);
 	}	
-	if(j<(this.field_width-1)){
-		this.field_cells[i][j+1].emitClick();		
-	}
+}
+//открываем ячейки вниз
+Field.prototype.openCellsBottom = function (i,j){
 	if(i<(this.field_height-1)){
-		this.field_cells[i+1][j].emitClick();
-		//if(this.field_cells[i+1][j].mines_around==0) this.openCells(i+1,j);
-	}
-	///////
-	if(i>0&&j>0){
-		this.field_cells[i-1][j-1].emitClick();
-		if(this.field_cells[i-1][j-1].mines_around==0) 
-			if((i-1)>0&&(j-1)>0)this.openCells(i-2,j-2);
-	}
-	if(i>0&&j<(this.field_height-1)){
-		this.field_cells[i-1][j+1].emitClick();
-		//if(this.field_cells[i-1][j+1].mines_around==0) this.openCells(i-1,j+1);
-	}
-	if(j>0&&i<(this.field_width-1)){
-		this.field_cells[i+1][j-1].emitClick();
-		//if(this.field_cells[i+1][j-1].mines_around==0) this.openCells(i+1,j-1);
-	}
-	if(i<(this.field_width-1)>0&&j<(this.field_height-1)) this.field_cells[i+1][j+1].emitClick();
+		this.openDirect(i*1+1,j);
+	}	
+}
+//открываем ячейки влево
+Field.prototype.openCellsLeft = function (i,j){
+	if(j>0){
+		this.openDirect(i,j-1);
+	}	
+}
+//открываем ячейки вправо
+Field.prototype.openCellsRight = function (i,j){
+	if(j<(this.field_width-1)){
+		this.openDirect(i,j*1+1);
+	}	
+}
+Field.prototype.openCells = function (i,j){		
+	this.openCellsTop(i,j);	
+	this.openCellsBottom(i,j);
+	this.openCellsLeft(i,j);
+	this.openCellsRight(i,j);
 }
 //мы-таки подорвались
 Field.prototype.GameOver = function(){	
+	this.endAction();
 	document.getElementById("game_status").className="lose";	
-	//this.endAction();	
 	console.log("Сожалею, вы подорвались");
 }
 //если ячейка пустая
@@ -122,19 +126,25 @@ Field.prototype.drawArounds = function(mines){
 Field.prototype.cellClick = function(){
 	for(var i=0; i<this.field_width; i++)
 		for(var j=0; j<this.field_height; j++)
-		{			
+		{
 			var context=this.field_cells[i][j];
-			this.field_cells[i][j].elem.addEventListener('click',context.checkClick.bind(context));
+			this.field_cells[i][j].elem.addEventListener('click',context.checkClick.bind(context));			
 			this.field_cells[i][j].elem.addEventListener('contextmenu',context.checkFlag.bind(context));			
-		}		
+		}
 }
-//убираем слушателя
-Field.prototype.endAction = function(){
+//интриги больше нет
+Field.prototype.endAction = function(){	
 	for(var i=0; i<this.field_width; i++)
 		for(var j=0; j<this.field_height; j++)
-		{			
-			var context=this.field_cells[i][j];
-			this.field_cells[i][j].elem.removeEventListener('click',context.checkClick.bind(context));
-			this.field_cells[i][j].elem.removeEventListener('contextmenu',context.checkFlag.bind(context));			
+		{		
+			//насильно убираем все флажки
+			if(this.field_cells[i][j].status==2)
+			{
+				this.field_cells[i][j].status=0;
+				this.field_cells[i][j].removeFlag();
+			}
+			//эмитируем нажатие ячейки
+			if(this.field_cells[i][j].status!=1)
+				this.field_cells[i][j].emitClick(1);	
 		}
 }

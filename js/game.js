@@ -1,7 +1,7 @@
-var Game= function(size){
+var Game= function(cnt, size){
 	this.size=size;
 	document.getElementById("field").innerHTML=this.drawCells();
-	this.field = new Field(size);	
+	this.field = new Field(cnt, size);	
 }
 //создаем ячейки
 Game.prototype.drawCells = function(){
@@ -27,15 +27,16 @@ Game.prototype.getField= function(){
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 function newGame(){	
-	var cnt=10;
-	var game = new Game(cnt);	
+	var cnt=13;
+	var size =9;
+	var game = new Game(cnt, size);	
 
 	//создание поля
 	game.getField();
 	
 	//прорисовка поля
 	document.getElementById("game_status").className="ok";
-	document.getElementById("saper").style.width=(60+cnt*20)+"px";	
+	document.getElementById("saper").style.width=(60+size*20)+"px";	
 	document.getElementById("bomb_cnt").innerHTML=cnt;
 }
 

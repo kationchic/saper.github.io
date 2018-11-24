@@ -7,24 +7,28 @@ var Cell = function(i,j) {
 	this.mines_around=0;	
 	//наше место в этой вселенной
 	this.c_i=i;
-	this.c_j=j	
+	this.c_j=j		
 	//ячейка как элемент
 	this.elem = document.getElementById('cell-'+i+'-'+j);	
 }
 /////////////////////////////////////////////////
+//пустая ли ячейка или с сюрпризом
+Cell.prototype.isEmpty = function(){	
+	if (this.mines_around==0) return true; else return false;
+}
 //открываем ячейку
-Cell.prototype.cellOpen = function(is_emit=0){	
+Cell.prototype.cellOpen = function(is_emit=0){	//is_emit натуральный клик или сэмитированный	
 	this.drawOpen();
-	//если мина - то кончина
+	//если мина - то кончина	
 	if(this.is_mine)
 	{		
 		this.drawMine();
-		this.elem.dispatchEvent(is_lose);
+		this.elem.dispatchEvent(is_lose);		
 	}
 	else //выводим циферки
-	if(this.mines_around>0) 	
+	if(!this.isEmpty()) 	
 		this.drawMinesAround();	
-	else if(!is_emit) //если ячейка пуста
+	else if(!is_emit) //если нажатие не было сэмитировано нужно дать понять что оно таки было
 	{
 		this.elem.innerHTML=" ";		
 		this.elem.dispatchEvent(open_empty);		
@@ -32,11 +36,16 @@ Cell.prototype.cellOpen = function(is_emit=0){
 		
 };
 //эмитируем клик
-Cell.prototype.emitClick = function(){	
+Cell.prototype.emitClick = function(game_end=0){	
 	if(this.status==0&&!this.is_mine) 
 	{		
 		this.cellOpen(1);
 		this.status = 1;	
+	}
+	else if(this.is_mine&&game_end)
+	{
+		this.drawOpen();
+		this.drawMine();		
 	}
 }
 //реагируем на клик
@@ -101,6 +110,7 @@ Cell.prototype.drawFlag = function(){
 Cell.prototype.removeFlag = function(){
 	this.elem.classList.remove("cell_flag");
 };
+
 //прорисовываем число окружающих мин
 Cell.prototype.drawMinesAround = function(){
 	this.elem.innerHTML=this.mines_around;
